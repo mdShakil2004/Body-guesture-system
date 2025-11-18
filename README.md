@@ -6,27 +6,7 @@ This project streams live webcam video from the browser to a FastAPI server (run
 
 
 
- /* import subprocess, re, time
 
-print("Starting Cloudflare tunnel...")
-proc = subprocess.Popen(
-    ["cloudflared", "tunnel", "--url", "http://0.0.0.0:8000"],
-    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
-)
-
-public_url = None
-for _ in range(60):
-    line = proc.stdout.readline().strip()
-    print(line)
-    match = re.search(r"https://[-a-zA-Z0-9]+\.trycloudflare\.com", line)
-    if match:
-        public_url = match.group(0)
-        break
-    time.sleep(0.5)
-
-print("PUBLIC URL:", public_url)
-print("CLIENT PAGE:", public_url + "/client.html")
-*/
 
 - Mediapipe Face Detection  
 - Mediapipe Pose (Shoulders)  
@@ -71,5 +51,30 @@ Browser → WebSocket → FastAPI → Mediapipe/cvzone → WebSocket → Browser
 4. Open the printed URL:
 
 
+
+
+
+
+here tunnel :  example ->>   
+import subprocess, re, time
+
+print("Starting Cloudflare tunnel...")
+proc = subprocess.Popen(
+    ["cloudflared", "tunnel", "--url", "http://0.0.0.0:8000"],
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+)
+
+public_url = None
+for _ in range(60):
+    line = proc.stdout.readline().strip()
+    print(line)
+    match = re.search(r"https://[-a-zA-Z0-9]+\.trycloudflare\.com", line)
+    if match:
+        public_url = match.group(0)
+        break
+    time.sleep(0.5)
+
+print("PUBLIC URL:", public_url)
+print("CLIENT PAGE:", public_url + "/client.html")
 
 
