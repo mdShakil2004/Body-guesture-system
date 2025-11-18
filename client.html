@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Realtime Camera → AI</title>
+<style>
+body { font-family: Arial; background:#111; color:#eee; text-align:center; }
+#remote { border:3px solid #555; max-width:95vw; margin-top:12px; }
+button { padding:10px 16px; border-radius:6px; font-size:16px; cursor:pointer; margin:8px; }
+#start { background:#3db; }
+#stop { background:#d55; color:#fff; }
+</style>
+</head>
+<body>
+
+<h2>Realtime Camera → AI Server</h2>
+<p id="status">Click Start</p>
+
+<video id="cam" autoplay playsinline width="640" height="480" style="display:none"></video>
+<canvas id="canvas" width="640" height="480" style="display:none"></canvas>
+<img id="remote">
+
+<br>
+<button id="start">Start Stream</button>
+<button id="stop">Stop</button>
+
+<script>
+let ws = null, loop = null;
+
+const video = document.getElementById("cam");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const remote = document.getElementById("remote");
+const status = document.getElementById("status");
+
+const wsURL = window.location.origin.replace("http","ws") + "/ws";
+
+async function startCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({ video:true });
+    video.srcObject = stream;
+    await video.play();
+}
+
+function connectWS() {
+    ws = new WebSocket(wsURL);
+
+    ws.onopen = () => status.innerText = "WS Connected";
+    ws.onerror = () => status.innerText = "WS Error";
+    ws.onclose = () => status.innerText = "WS Closed";
+
+    ws.onmessage = msg => {
+        try {
+            const data = JSON.parse(msg.data);
+            if (data.image) remote.src = data.image;
+        } catch {}
+    };
+}
+
+function startLoop() {
+    loop = setInterval(() => {
+        ctx.drawImage(video, 0, 0, 640, 480);
+        const b64 = canvas.toDataURL("image/jpeg", 0.8);
+        if (ws.readyState === 1) ws.send(JSON.stringify({ image: b64 }));
+    }, 80);
+}
+
+document.getElementById("start").onclick = async () => {
+    await startCamera();
+    connectWS();
+    setTimeout(startLoop, 600);
+};
+
+document.getElementById("stop").onclick = () => {
+    clearInterval(loop);
+    ws.close();
+    status.innerText = "Stopped";
+};
+</script>
+
+</body>
+</html>
