@@ -1,77 +1,75 @@
-Real-Time Body & Gesture Detection System
+# Realtime Gesture AI (Face + Hands + Body Pose)
 
-A Python-based real-time face, hand, finger, and body gesture detection system built using YOLOv8, OpenCV, cvzone, and MediaPipe.
+Real-time webcam → Cloud → AI processing → Browser output.
 
-This project captures webcam input and performs live detection of:
-
-👤 Face detection
-
-✋ Hand tracking + finger count
-
-🤟 Gesture recognition (V sign, fist, OK, etc.)
-
-🧍 Basic body estimation (shoulders)
-
-The system also includes a built-in fallback mode that uses skin segmentation whenever MediaPipe is unavailable. Everything runs completely offline.
-
-✨ Features
-✅ 1. Real-Time Face Detection
-
-Uses Haar Cascade to detect faces and draw bounding boxes.
-
-✅ 2. Hand & Finger Detection
-
-Uses cvzone HandDetector (MediaPipe)
-
-Detects left/right hand
-
-Counts number of fingers
-
-Shows bounding box + label
-
-✅ 3. Gesture Recognition
-
-Recognizes common gestures like:
-
-✌️ V Sign
-
-✊ Fist
-
-👌 OK Sign
-
-✅ 4. Fallback Hand Detection (YOLO + Skin Mask)
-
-If cvzone fails, the system switches to a custom hand detection method:
-
-YOLO detects the person region
-
-Skin segmentation isolates hand region
-
-Convex hull + defects used for finger counting
-
-Zero dependencies? No problem — system still works.
-
-✅ 5. Body Part Estimation
-
-Estimates left & right shoulder positions using YOLO person bounding box.
-
-✅ 6. Tkinter Control Panel
-
-Small popup window with an Exit button to stop the application cleanly.
+This project streams live webcam video from the browser to a FastAPI server (running on Colab or any backend). The server processes the frame using:
 
 
 
-| Component          | Technology              |
-| ------------------ | ----------------------- |
-| Object Detection   | YOLOv8 (Ultralytics)    |
-| Hand Tracking      | cvzone + MediaPipe      |
-| Fallback Detection | Skin-color segmentation |
-| Rendering          | OpenCV                  |
-| UI                 | Tkinter                 |
-| Language           | Python 3.x              |
+ /* import subprocess, re, time
+
+print("Starting Cloudflare tunnel...")
+proc = subprocess.Popen(
+    ["cloudflared", "tunnel", "--url", "http://0.0.0.0:8000"],
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+)
+
+public_url = None
+for _ in range(60):
+    line = proc.stdout.readline().strip()
+    print(line)
+    match = re.search(r"https://[-a-zA-Z0-9]+\.trycloudflare\.com", line)
+    if match:
+        public_url = match.group(0)
+        break
+    time.sleep(0.5)
+
+print("PUBLIC URL:", public_url)
+print("CLIENT PAGE:", public_url + "/client.html")
+*/
+
+- Mediapipe Face Detection  
+- Mediapipe Pose (Shoulders)  
+- cvzone Hand Tracking  
+- OpenCV  
+
+Then sends the processed frame back to the browser **in real-time** using WebSockets.
+
+---
+
+## 🚀 Features
+- Real-time < 100ms latency  
+- Face detection  
+- Hand tracking + finger count  
+- Body pose (shoulders)  
+- WebSocket-based video streaming  
+- Cloudflare tunnel (no login, free)  
+- Works on laptop and phone  
+- Works in Google Colab  
+
+---
+
+## 📦 Files
+- `server.py` – FastAPI WebSocket + AI processing  
+- `client.html` – Browser webcam stream UI  
+- `run_server.ipynb` – Start server in Colab with Cloudflare tunnel  
+- `requirements.txt`  
+
+---
+
+## 🧠 How It Works
+
+Browser → WebSocket → FastAPI → Mediapipe/cvzone → WebSocket → Browser
+
+---
+
+## 🔧 Run in Colab
+
+1. Upload repo  
+2. Open `run_server.ipynb`  
+3. Run all cells  
+4. Open the printed URL:
 
 
 
 
-#run it to install 
-pip install ultralytics opencv-python numpy cvzone mediapipe==0.10.21
